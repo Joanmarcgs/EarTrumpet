@@ -6,7 +6,9 @@ All credit for the original app — its design, its audio engine, its years of p
 
 ## What Burxat's Mixer adds
 
-Open it from the tray icon's context menu ("Burxat's Mixer") alongside the regular EarTrumpet flyout.
+Right-click EarTrumpet's tray icon and pick "Burxat's Mixer" to open it, alongside the regular EarTrumpet flyout.
+
+![Opening Burxat's Mixer from the tray icon's context menu](./Graphics/BurxatMixer/tray-menu.png)
 
 ### A console for every device and every app
 
