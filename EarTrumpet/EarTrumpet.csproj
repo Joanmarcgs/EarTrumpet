@@ -68,6 +68,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath Condition="Exists('$(MSBuildProgramFiles32)\Windows Kits\10\UnionMetadata\Windows.winmd')">$(MSBuildProgramFiles32)\Windows Kits\10\UnionMetadata\Windows.winmd</HintPath>
       <HintPath Condition="Exists('$(MSBuildProgramFiles32)\Windows Kits\10\UnionMetadata\10.0.16299.0\Windows.winmd')">$(MSBuildProgramFiles32)\Windows Kits\10\UnionMetadata\10.0.16299.0\Windows.winmd</HintPath>
+      <HintPath Condition="Exists('$(MSBuildProgramFiles32)\Windows Kits\10\UnionMetadata\10.0.18362.0\Windows.winmd')">$(MSBuildProgramFiles32)\Windows Kits\10\UnionMetadata\10.0.18362.0\Windows.winmd</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
@@ -327,6 +328,9 @@
     <Compile Include="Diagnosis\LocalDataExporter.cs" />
     <Compile Include="AppSettings.cs" />
     <Compile Include="UI\ViewModels\WelcomeViewModel.cs" />
+    <Compile Include="UI\Views\BurxatMixerWindow.xaml.cs">
+      <DependentUpon>BurxatMixerWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\Views\DialogWindow.xaml.cs">
       <DependentUpon>DialogWindow.xaml</DependentUpon>
     </Compile>
@@ -402,6 +406,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\Mutable.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\BurxatMixerWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

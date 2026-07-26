@@ -37,6 +37,7 @@ namespace EarTrumpet
 
         private ShellNotifyIcon _trayIcon;
         private WindowHolder _mixerWindow;
+        private WindowHolder _burxatMixerWindow;
         private WindowHolder _settingsWindow;
         private ErrorReporter _errorReporter;
 
@@ -102,6 +103,7 @@ namespace EarTrumpet
             DebugHelpers.Add();
 #endif
             _mixerWindow = new WindowHolder(CreateMixerExperience);
+            _burxatMixerWindow = new WindowHolder(() => new BurxatMixerWindow());
             _settingsWindow = new WindowHolder(CreateSettingsExperience);
 
             Settings.FlyoutHotkeyTyped += () => _flyoutViewModel.OpenFlyout(InputType.Keyboard);
@@ -229,6 +231,7 @@ namespace EarTrumpet
             ret.AddRange(new List<ContextMenuItem>
                 {
                     new ContextMenuItem { DisplayName = EarTrumpet.Properties.Resources.FullWindowTitleText, Command = new RelayCommand(_mixerWindow.OpenOrBringToFront) },
+                    new ContextMenuItem { DisplayName = "Burxat's Mixer", Command = new RelayCommand(_burxatMixerWindow.OpenOrBringToFront) },
                     new ContextMenuItem { DisplayName = EarTrumpet.Properties.Resources.SettingsWindowText, Command = new RelayCommand(_settingsWindow.OpenOrBringToFront) },
                     new ContextMenuItem { DisplayName = EarTrumpet.Properties.Resources.ContextMenuExitTitle, Command = new RelayCommand(Shutdown) },
                 });
