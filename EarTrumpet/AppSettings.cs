@@ -178,6 +178,29 @@ namespace EarTrumpet
             set => _settings.Set("SettingsWindowPlacement", value);
         }
 
+        public event Action<double> BurxatMixerScaleChanged;
+        public event Action<string> BurxatMixerThemeChanged;
+
+        public double BurxatMixerScale
+        {
+            get => _settings.Get("BurxatMixerScale", 1.0);
+            set
+            {
+                _settings.Set("BurxatMixerScale", value);
+                BurxatMixerScaleChanged?.Invoke(value);
+            }
+        }
+
+        public string BurxatMixerTheme
+        {
+            get => _settings.Get("BurxatMixerTheme", "Dark");
+            set
+            {
+                _settings.Set("BurxatMixerTheme", value);
+                BurxatMixerThemeChanged?.Invoke(value);
+            }
+        }
+
         private bool IsTelemetryEnabledByDefault()
         {
             // Discussion on what to include:

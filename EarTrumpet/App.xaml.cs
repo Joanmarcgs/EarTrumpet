@@ -103,7 +103,7 @@ namespace EarTrumpet
             DebugHelpers.Add();
 #endif
             _mixerWindow = new WindowHolder(CreateMixerExperience);
-            _burxatMixerWindow = new WindowHolder(() => new BurxatMixerWindow());
+            _burxatMixerWindow = new WindowHolder(() => new BurxatMixerWindow { DataContext = new BurxatMixerViewModel(CollectionViewModel) });
             _settingsWindow = new WindowHolder(CreateSettingsExperience);
 
             Settings.FlyoutHotkeyTyped += () => _flyoutViewModel.OpenFlyout(InputType.Keyboard);

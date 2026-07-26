@@ -27,7 +27,12 @@ namespace EarTrumpet.DataModel.WindowsAudio.Internal
             {
                 if (value != _default)
                 {
+                    // Match what Windows' own Sound settings does: set every role, not just
+                    // eMultimedia, otherwise apps that play through eConsole (most apps) keep
+                    // using the old device even though EarTrumpet now considers this the default.
+                    SetDefaultDevice(value, ERole.eConsole);
                     SetDefaultDevice(value, ERole.eMultimedia);
+                    SetDefaultDevice(value, ERole.eCommunications);
                     DefaultChanged?.Invoke(this, Default);
                 }
             }

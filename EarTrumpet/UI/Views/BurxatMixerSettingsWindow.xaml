@@ -1,0 +1,174 @@
+<Window x:Class="EarTrumpet.UI.Views.BurxatMixerSettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:Theme="clr-namespace:EarTrumpet.UI.Themes"
+        xmlns:vm="clr-namespace:EarTrumpet.UI.ViewModels"
+        Name="WindowRoot"
+        Title="Burxat's Mixer Settings"
+        Theme:AcrylicBrush.Background="AcrylicColor_Settings"
+        Theme:Options.Source="App"
+        Width="360"
+        MinWidth="320"
+        ResizeMode="NoResize"
+        SizeToContent="Height"
+        Style="{StaticResource DialogWindowStyle}"
+        TextOptions.TextFormattingMode="Display"
+        UseLayoutRounding="True"
+        WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <!--  Default (Dark) palette - BurxatMixerSettingsWindow.xaml.cs overwrites these entries live when the theme changes, same as the main window.  -->
+        <SolidColorBrush x:Key="BurxatWindowBackground" Color="#FF1B1B1B" />
+        <SolidColorBrush x:Key="BurxatText" Color="#FFF2F2F2" />
+        <SolidColorBrush x:Key="BurxatSubtleText" Color="#FFAFAFAF" />
+        <SolidColorBrush x:Key="BurxatCardBackground" Color="#FF2A2A2A" />
+        <SolidColorBrush x:Key="BurxatBorder" Color="#FF7A7A7A" />
+        <FontFamily x:Key="BurxatFontFamily">Segoe UI</FontFamily>
+
+        <Style x:Key="SectionHeaderStyle" TargetType="TextBlock">
+            <Setter Property="Margin" Value="0,14,0,4" />
+            <Setter Property="FontWeight" Value="Bold" />
+        </Style>
+
+        <!--
+            Plain toggle-chip buttons rather than a ComboBox: EarTrumpet's App.xaml defines an
+            app-wide implicit style for every ComboBox (its Settings page's search-as-you-type
+            box), so a bare <ComboBox/> here would silently behave like a search field instead of
+            a normal dropdown.
+        -->
+        <Style x:Key="ChoiceChipStyle" TargetType="Button">
+            <Setter Property="Margin" Value="0,0,6,6" />
+            <Setter Property="Padding" Value="10,4" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{DynamicResource BurxatText}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BurxatBorder}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                    <Setter Property="Background" Value="#3399FF" />
+                    <Setter Property="Foreground" Value="White" />
+                    <Setter Property="BorderBrush" Value="#3399FF" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <DataTemplate x:Key="ChoiceChipTemplate" DataType="{x:Type vm:SelectableOptionViewModel}">
+            <Button Command="{Binding Select}"
+                    Content="{Binding Label}"
+                    Style="{StaticResource ChoiceChipStyle}" />
+        </DataTemplate>
+
+        <Style x:Key="ActionButtonStyle" TargetType="Button">
+            <Setter Property="Padding" Value="8,2" />
+            <Setter Property="Background" Value="{DynamicResource BurxatCardBackground}" />
+            <Setter Property="Foreground" Value="{DynamicResource BurxatText}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BurxatBorder}" />
+        </Style>
+    </Window.Resources>
+    <!--
+        The Window's own Background must stay whatever DialogWindowStyle sets (Transparent), since
+        AllowsTransparency + the custom WindowChrome need that to hit-test correctly - painting the
+        theme color here instead, on an opaque child, keeps clicks working. (Same fix as the main
+        mixer window needed.)
+    -->
+    <Border Name="RootContent"
+            Background="{DynamicResource BurxatWindowBackground}"
+            TextElement.FontFamily="{DynamicResource BurxatFontFamily}"
+            TextElement.Foreground="{DynamicResource BurxatText}">
+        <DockPanel LastChildFill="True">
+            <Grid DockPanel.Dock="Top">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Margin="14,0,0,0"
+                           Text="Burxat's Mixer Settings"
+                           TextAlignment="Left" />
+                <Button x:Name="CloseButton"
+                        Grid.Column="1"
+                        Style="{StaticResource CloseButtonStyle}" />
+            </Grid>
+
+            <ScrollViewer MaxHeight="520" VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="14,4,14,14">
+                    <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="Display" />
+                    <TextBlock Text="Scale" />
+                    <ItemsControl Margin="0,4,0,0"
+                                  ItemsSource="{Binding ScaleChoices}"
+                                  ItemTemplate="{StaticResource ChoiceChipTemplate}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+
+                    <TextBlock Margin="0,8,0,0" Text="Theme" />
+                    <ItemsControl Margin="0,4,0,0"
+                                  ItemsSource="{Binding ThemeChoices}"
+                                  ItemTemplate="{StaticResource ChoiceChipTemplate}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+
+                    <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="Disabled Devices" />
+                    <TextBlock FontSize="10"
+                               Text="Windows is hiding these playback devices. Enabling one makes it appear on the main window."
+                               TextWrapping="Wrap"
+                               Foreground="{DynamicResource BurxatSubtleText}" />
+                    <ItemsControl Margin="0,4,0,0" ItemsSource="{Binding DisabledDevices}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="{x:Type vm:DisabledDeviceViewModel}">
+                                <Grid Margin="0,3,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock VerticalAlignment="Center"
+                                               Text="{Binding DisplayName}"
+                                               TextTrimming="CharacterEllipsis" />
+                                    <Button Grid.Column="1"
+                                            Command="{Binding Enable}"
+                                            Content="Enable"
+                                            Style="{StaticResource ActionButtonStyle}" />
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBlock Margin="0,4,0,0"
+                               FontSize="10"
+                               Foreground="{DynamicResource BurxatSubtleText}">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Text" Value="No disabled devices found." />
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding DisabledDevices.Count}" Value="0">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <Button Margin="0,4,0,0"
+                            HorizontalAlignment="Left"
+                            Command="{Binding RefreshDisabledDevices}"
+                            Content="Refresh"
+                            Style="{StaticResource ActionButtonStyle}" />
+
+                    <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="Credits" />
+                    <TextBlock FontSize="11" Text="{Binding OriginalCredit}" TextWrapping="Wrap" />
+                    <TextBlock Margin="0,4,0,0"
+                               FontSize="11"
+                               Text="{Binding DeveloperCredit}"
+                               TextWrapping="Wrap" />
+                    <TextBlock Margin="0,4,0,0"
+                               FontSize="11"
+                               Text="{Binding AssistantCredit}"
+                               TextWrapping="Wrap" />
+                </StackPanel>
+            </ScrollViewer>
+        </DockPanel>
+    </Border>
+</Window>

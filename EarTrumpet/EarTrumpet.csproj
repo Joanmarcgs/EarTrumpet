@@ -328,8 +328,18 @@
     <Compile Include="Diagnosis\LocalDataExporter.cs" />
     <Compile Include="AppSettings.cs" />
     <Compile Include="UI\ViewModels\WelcomeViewModel.cs" />
+    <Compile Include="UI\ViewModels\BurxatMixerViewModel.cs" />
+    <Compile Include="UI\ViewModels\MixerChannelViewModel.cs" />
+    <Compile Include="UI\ViewModels\MixerAppViewModel.cs" />
+    <Compile Include="UI\ViewModels\BurxatMixerSettingsViewModel.cs" />
+    <Compile Include="UI\ViewModels\DisabledDeviceViewModel.cs" />
+    <Compile Include="UI\ViewModels\SelectableOptionViewModel.cs" />
+    <Compile Include="UI\Views\ThemePalette.cs" />
     <Compile Include="UI\Views\BurxatMixerWindow.xaml.cs">
       <DependentUpon>BurxatMixerWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\BurxatMixerSettingsWindow.xaml.cs">
+      <DependentUpon>BurxatMixerSettingsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\Views\DialogWindow.xaml.cs">
       <DependentUpon>DialogWindow.xaml</DependentUpon>
@@ -410,6 +420,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\Views\BurxatMixerWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\BurxatMixerSettingsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
