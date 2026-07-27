@@ -4,6 +4,15 @@ This is a personal fork of [EarTrumpet](https://github.com/File-New-Project/EarT
 
 All credit for the original app — its design, its audio engine, its years of polish — belongs to the original EarTrumpet team. This fork exists to add one extra tool on top of their work, not to replace it. See [Credits](#credits) below.
 
+## Download
+
+[![Download Burxat's Mixer for EarTrumpet](https://img.shields.io/badge/Download-Burxat's_Mixer_for_EarTrumpet-blue?style=for-the-badge&logo=windows)](https://github.com/Joanmarcgs/EarTrumpet/releases/latest)
+
+Windows only. This build replaces EarTrumpet rather than adding onto it — **if you already have EarTrumpet installed** (Microsoft Store, winget, Chocolatey, or a previous manual copy), uninstall or remove it first, so its tray icon and this fork's don't end up running side by side.
+
+1. Download and unzip the [latest release](https://github.com/Joanmarcgs/EarTrumpet/releases/latest) anywhere, e.g. `C:\Program Files\BurxatMixer`.
+2. Run `EarTrumpet.exe` to start it normally, or run `BurxatMixer.exe` to start EarTrumpet and land straight in the mixer. Running `BurxatMixer.exe` again while it's already open just brings the mixer back to the front instead of starting a second copy.
+
 ## What Burxat's Mixer adds
 
 Right-click EarTrumpet's tray icon and pick "Burxat's Mixer" to open it, alongside the regular EarTrumpet flyout.
