@@ -11,8 +11,10 @@ using EarTrumpet.UI.Views;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO.Pipes;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
@@ -40,8 +42,14 @@ namespace EarTrumpet
         private WindowHolder _burxatMixerWindow;
         private WindowHolder _settingsWindow;
         private ErrorReporter _errorReporter;
+        private bool _openBurxatMixerOnStartup;
 
         public static AppSettings Settings { get; private set; }
+
+        // Command-line flag used by the standalone BurxatMixer.exe launcher (see BurxatMixerLauncher
+        // project) so it can pop the mixer open whether or not EarTrumpet is already running.
+        private const string BurxatMixerArg = "--burxat-mixer";
+        private const string BurxatMixerActivationPipeName = "EarTrumpet-BurxatMixer-9f1c3d2a6b0e4f7e9c9f9b6d9e6c9f2c";
 
         private void OnAppStartup(object sender, StartupEventArgs e)
         {
@@ -55,6 +63,8 @@ namespace EarTrumpet
 
             Settings = new AppSettings();
             _errorReporter = new ErrorReporter(Settings);
+
+            _openBurxatMixerOnStartup = e.Args.Contains(BurxatMixerArg);
 
             if (SingleInstanceAppMutex.TakeExclusivity())
             {
@@ -72,7 +82,50 @@ namespace EarTrumpet
             }
             else
             {
+                // Another instance is already running: ask it to open Burxat's Mixer instead of
+                // starting a second copy of EarTrumpet.
+                if (_openBurxatMixerOnStartup)
+                {
+                    RequestBurxatMixerFromRunningInstance();
+                }
                 Shutdown();
+            }
+        }
+
+        private void StartBurxatMixerActivationServer()
+        {
+            Task.Run(async () =>
+            {
+                while (!IsShuttingDown)
+                {
+                    try
+                    {
+                        using (var server = new NamedPipeServerStream(BurxatMixerActivationPipeName, PipeDirection.In))
+                        {
+                            await server.WaitForConnectionAsync();
+                            Dispatcher.Invoke(() => _burxatMixerWindow.OpenOrBringToFront());
+                        }
+                    }
+                    catch
+                    {
+                        // Keep listening across transient pipe errors; a failed activation request shouldn't kill the app.
+                    }
+                }
+            });
+        }
+
+        private static void RequestBurxatMixerFromRunningInstance()
+        {
+            try
+            {
+                using (var client = new NamedPipeClientStream(".", BurxatMixerActivationPipeName, PipeDirection.Out))
+                {
+                    client.Connect(2000);
+                }
+            }
+            catch
+            {
+                // Best-effort: if the running instance isn't listening yet, there's nothing more we can do here.
             }
         }
 
@@ -105,6 +158,12 @@ namespace EarTrumpet
             _mixerWindow = new WindowHolder(CreateMixerExperience);
             _burxatMixerWindow = new WindowHolder(() => new BurxatMixerWindow { DataContext = new BurxatMixerViewModel(CollectionViewModel) });
             _settingsWindow = new WindowHolder(CreateSettingsExperience);
+
+            StartBurxatMixerActivationServer();
+            if (_openBurxatMixerOnStartup)
+            {
+                _burxatMixerWindow.OpenOrBringToFront();
+            }
 
             Settings.FlyoutHotkeyTyped += () => _flyoutViewModel.OpenFlyout(InputType.Keyboard);
             Settings.MixerHotkeyTyped += () => _mixerWindow.OpenOrClose();
