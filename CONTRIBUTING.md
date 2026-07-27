@@ -1,34 +1,22 @@
-# Contributing to EarTrumpet
-Thanks for your interest in contributing to EarTrumpet!
+# Contributing to BurxatMixer-EarTrumpet
 
-You can contribute to EarTrumpet with issues and pull requests (PRs). Simply filing issues for problems you encounter is a great way to contribute. Contributing code via the below workflow is greatly appreciated.
+This is Burxat's personal fork of [EarTrumpet](https://github.com/File-New-Project/EarTrumpet), adding "Burxat's Mixer" on top of it. There's no team behind it, so the workflow here is much lighter than a typical open-source project.
+
+## Contributing to this fork
+
+Issues and pull requests are welcome, whether they're about Burxat's Mixer specifically or anything else in this repo.
+
+1. Fork this repository and create a branch for your change.
+2. If you're touching the Burxat's Mixer code, read [BURXAT_MIXER_DEVELOPMENT.md](./BURXAT_MIXER_DEVELOPMENT.md) first — it covers the file layout, the patterns this fork follows, and a few gotchas in the underlying codebase worth knowing about before you add new controls.
+3. Build the repo and make sure it still builds cleanly in `Debug`, `Release`, and `VSDebug` (see [COMPILING.md](./COMPILING.md)).
+4. Open a pull request against `master` describing what changed and why.
+
+There's no formal review team or SLA here — this is a side project, so response times will vary.
+
+## Contributing to the original EarTrumpet
+
+If your change is about EarTrumpet itself rather than the Burxat's Mixer addition, consider opening it against the [upstream project](https://github.com/File-New-Project/EarTrumpet) instead, following [their contribution guidelines](https://github.com/File-New-Project/EarTrumpet/blob/main/CONTRIBUTING.md).
 
 ## Copyright
 
-EarTrumpet copyright is held by "Rafael Rivera, David Golden, David "Dave" Amenta, and Contributors".
-
-## Contribution Workflow
-
-Before contributing code, we require the following workflow:
-
-1. Create an issue for your work or reuse an existing issue on the topic, if there is one.
-
-2. Get agreement from the team that your proposed change is OK. (You can alternatively email the `team@eartrumpet.app`.)
-
-3. Clearly state that you are going to take on the bug/enhancement work and we will assign the task to you.
-
-4. Create a fork of the repository on GitHub (if you don't already have one).
-
-5. Create a branch from **dev** (`git checkout -b mybranch dev`).
-
-6. Name the branch so that it clearly communicates your intentions, such as issue-123 or feature-456.
-
-7. Build the repository with your changes. Make sure that the builds are clean in all configurations (i.e. `Debug`, `Release`, and `VSDebug`).
-
-8. Commit and push your changes to your fork.
-
-9. Create a pull request (PR) against our **dev** branch.
-
-    ℹ It is OK for your PR to include a large number of commits. We will squash them on merge.
-
-    ℹ It is also OK to create your PR as "[WIP]" before the implementation is done. This can be useful if you'd like to start the feedback process while you finish your implementation. State that this is the case in the initial PR comment.
+EarTrumpet copyright is held by Rafael Rivera, David Golden, David "Dave" Amenta, and contributors. The Burxat's Mixer additions in this fork are copyright Burxat and contributors to this fork. See [LICENSE](./LICENSE).
