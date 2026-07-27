@@ -12,8 +12,8 @@ namespace EarTrumpet.UI.Views
 {
     public partial class BurxatMixerWindow : Window
     {
-        private const double BaseWidth = 560;
-        private const double BaseHeight = 560;
+        private const double BaseWidth = 700;
+        private const double BaseHeight = 900;
         private const string DraggedAppFormat = "EarTrumpet.BurxatMixer.App";
 
         private Point _dragStartPoint;
@@ -31,6 +31,20 @@ namespace EarTrumpet.UI.Views
                 App.Settings.BurxatMixerStayOnTopChanged -= ApplyStayOnTop;
             };
             SourceInitialized += OnSourceInitialized;
+            SourceInitialized += (sender, __) =>
+            {
+                if (App.Settings.BurxatMixerWindowPlacement != null)
+                {
+                    User32.SetWindowPlacement(new WindowInteropHelper((Window)sender).Handle, App.Settings.BurxatMixerWindowPlacement.Value);
+                }
+            };
+            Closing += (sender, __) =>
+            {
+                if (User32.GetWindowPlacement(new WindowInteropHelper((Window)sender).Handle, out var placement))
+                {
+                    App.Settings.BurxatMixerWindowPlacement = placement;
+                }
+            };
 
             App.Settings.BurxatMixerScaleChanged += ApplyScale;
             App.Settings.BurxatMixerThemeChanged += ApplyTheme;
@@ -168,7 +182,8 @@ namespace EarTrumpet.UI.Views
                 ((FrameworkElement)sender).DataContext is MixerChannelViewModel channel &&
                 DataContext is BurxatMixerWindowViewModel windowViewModel)
             {
-                windowViewModel.SelectedMixer.MoveAppToChannel(channel, app);
+                var mixer = channel.Kind == MixerDeviceKind.Output ? windowViewModel.Output : windowViewModel.Input;
+                mixer.MoveAppToChannel(channel, app);
             }
         }
 

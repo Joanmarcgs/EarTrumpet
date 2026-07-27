@@ -8,10 +8,10 @@
         Title="Burxat's Mixer for EarTrumpet"
         Theme:AcrylicBrush.Background="AcrylicColor_Settings"
         Theme:Options.Source="App"
-        Width="560"
-        Height="560"
+        Width="700"
+        Height="900"
         MinWidth="480"
-        MinHeight="400"
+        MinHeight="500"
         ResizeMode="CanResize"
         Style="{StaticResource DialogWindowStyle}"
         TextOptions.TextFormattingMode="Display"
@@ -23,19 +23,11 @@
         <SolidColorBrush x:Key="BurxatText" Color="#FFF2F2F2" />
         <SolidColorBrush x:Key="BurxatSubtleText" Color="#FFAFAFAF" />
         <SolidColorBrush x:Key="BurxatCardBackground" Color="#FF2A2A2A" />
+        <SolidColorBrush x:Key="BurxatZoneBackground" Color="#FF242424" />
         <SolidColorBrush x:Key="BurxatTrack" Color="#FF4A4A4A" />
         <SolidColorBrush x:Key="BurxatFaderThumb" Color="#FFE8E8E8" />
         <SolidColorBrush x:Key="BurxatBorder" Color="#FF7A7A7A" />
         <FontFamily x:Key="BurxatFontFamily">Segoe UI</FontFamily>
-
-        <Style x:Key="DeviceKindToggleStyle" TargetType="Button">
-            <Setter Property="Margin" Value="0,0,6,0" />
-            <Setter Property="Padding" Value="12,5" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="Foreground" Value="{DynamicResource BurxatText}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource BurxatBorder}" />
-        </Style>
 
         <!--  A slim track + rectangular cap, closer to a physical mixer fader than the app's default slider.  -->
         <Style x:Key="AnalogFaderStyle" TargetType="{x:Type Slider}">
@@ -196,6 +188,90 @@
                 <ItemsControl Margin="0,4,0,0" ItemsSource="{Binding Apps}" />
             </StackPanel>
         </DataTemplate>
+
+        <!--  A section of the mixer for one device kind: a leading full-width rule, its master
+              fader, then its device columns in a softly-tinted zone box.  -->
+        <DataTemplate x:Key="MixerZoneTemplate" DataType="{x:Type vm:BurxatMixerViewModel}">
+            <StackPanel>
+                <Grid Margin="14,10,14,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Rectangle Grid.Column="0"
+                               Height="2"
+                               Margin="0,0,14,0"
+                               VerticalAlignment="Center"
+                               Fill="{DynamicResource BurxatText}"
+                               Opacity="0.85" />
+                    <TextBlock Grid.Column="1"
+                               FontSize="18"
+                               FontWeight="Bold"
+                               Text="{Binding MasterFaderLabel}" />
+                    <Rectangle Grid.Column="2"
+                               Height="2"
+                               Margin="14,0,0,0"
+                               VerticalAlignment="Center"
+                               Fill="{DynamicResource BurxatText}"
+                               Opacity="0.85" />
+                </Grid>
+
+                <StackPanel Width="220"
+                            Margin="10,10,10,6"
+                            HorizontalAlignment="Center"
+                            AllowDrop="True"
+                            DragOver="Channel_DragOver"
+                            Drop="MasterFader_Drop">
+                    <Grid Margin="0,0,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="36" />
+                        </Grid.ColumnDefinitions>
+                        <Slider Grid.Column="0"
+                                Style="{StaticResource AnalogFaderStyle}"
+                                Value="{Binding MasterVolume, Mode=TwoWay}" />
+                        <TextBlock Grid.Column="1"
+                                   HorizontalAlignment="Right"
+                                   Text="{Binding MasterVolume, Mode=OneWay}" />
+                    </Grid>
+                    <Grid Margin="0,4,0,0" MinHeight="34">
+                        <Rectangle RadiusX="4"
+                                   RadiusY="4"
+                                   Stroke="{DynamicResource BurxatBorder}"
+                                   StrokeDashArray="3,2"
+                                   StrokeThickness="1" />
+                        <TextBlock Margin="6,4"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   FontSize="10"
+                                   Text="{Binding ResetHintText}"
+                                   TextAlignment="Center"
+                                   TextWrapping="Wrap"
+                                   Foreground="{DynamicResource BurxatSubtleText}" />
+                    </Grid>
+                </StackPanel>
+
+                <!--  The horizontally-scrollable row of this zone's devices, boxed in a soft,
+                      theme-following tint so it reads as one group - the devices stay the
+                      visual focus, so the tint is deliberately subtle.  -->
+                <Border Margin="14,10,14,16"
+                        Background="{DynamicResource BurxatZoneBackground}"
+                        CornerRadius="8">
+                    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                        <ItemsControl Margin="0,4,0,8"
+                                      HorizontalAlignment="Center"
+                                      ItemsSource="{Binding Channels}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Border>
+            </StackPanel>
+        </DataTemplate>
     </Window.Resources>
     <!--
         The Window's own Background must stay whatever DialogWindowStyle sets (Transparent), since
@@ -238,90 +314,11 @@
                     Style="{StaticResource CloseButtonStyle}" />
         </Grid>
 
-        <StackPanel Margin="14,6,0,0"
-                    HorizontalAlignment="Left"
-                    DockPanel.Dock="Top"
-                    Orientation="Horizontal">
-            <Button Command="{Binding ShowOutput}" Content="Output Devices">
-                <Button.Style>
-                    <Style BasedOn="{StaticResource DeviceKindToggleStyle}" TargetType="Button">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsShowingOutput}" Value="True">
-                                <Setter Property="Background" Value="#3399FF" />
-                                <Setter Property="Foreground" Value="White" />
-                                <Setter Property="BorderBrush" Value="#3399FF" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Button.Style>
-            </Button>
-            <Button Command="{Binding ShowInput}" Content="Input Devices">
-                <Button.Style>
-                    <Style BasedOn="{StaticResource DeviceKindToggleStyle}" TargetType="Button">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsShowingInput}" Value="True">
-                                <Setter Property="Background" Value="#3399FF" />
-                                <Setter Property="Foreground" Value="White" />
-                                <Setter Property="BorderBrush" Value="#3399FF" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Button.Style>
-            </Button>
-        </StackPanel>
-
-        <StackPanel Width="220"
-                    Margin="10,6"
-                    AllowDrop="True"
-                    DataContext="{Binding SelectedMixer}"
-                    DockPanel.Dock="Top"
-                    DragOver="Channel_DragOver"
-                    Drop="MasterFader_Drop">
-            <TextBlock FontSize="18"
-                       FontWeight="Bold"
-                       Text="Master Fader" />
-            <Grid Margin="0,6,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="36" />
-                </Grid.ColumnDefinitions>
-                <Slider Grid.Column="0"
-                        Style="{StaticResource AnalogFaderStyle}"
-                        Value="{Binding MasterVolume, Mode=TwoWay}" />
-                <TextBlock Grid.Column="1"
-                           HorizontalAlignment="Right"
-                           Text="{Binding MasterVolume, Mode=OneWay}" />
-            </Grid>
-            <Grid Margin="0,4,0,0" MinHeight="34">
-                <Rectangle RadiusX="4"
-                           RadiusY="4"
-                           Stroke="{DynamicResource BurxatBorder}"
-                           StrokeDashArray="3,2"
-                           StrokeThickness="1" />
-                <TextBlock Margin="6,4"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"
-                           FontSize="10"
-                           Text="{Binding ResetHintText}"
-                           TextAlignment="Center"
-                           TextWrapping="Wrap"
-                           Foreground="{DynamicResource BurxatSubtleText}" />
-            </Grid>
-        </StackPanel>
-
-        <Separator Margin="10,4" DockPanel.Dock="Top" />
-
-        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-            <ItemsControl Margin="0,0,0,12"
-                          HorizontalAlignment="Center"
-                          DataContext="{Binding SelectedMixer}"
-                          ItemsSource="{Binding Channels}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel Orientation="Horizontal" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-            </ItemsControl>
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="0,0,0,12">
+                <ContentControl Content="{Binding Output}" ContentTemplate="{StaticResource MixerZoneTemplate}" />
+                <ContentControl Content="{Binding Input}" ContentTemplate="{StaticResource MixerZoneTemplate}" />
+            </StackPanel>
         </ScrollViewer>
         </DockPanel>
     </Border>

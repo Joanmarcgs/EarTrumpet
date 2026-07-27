@@ -10,6 +10,7 @@ namespace EarTrumpet.UI.ViewModels
     {
         public MixerDeviceKind Kind { get; }
         public string KindLabel => Kind == MixerDeviceKind.Output ? "Output" : "Input";
+        public string MasterFaderLabel => $"Master Fader ({KindLabel}s)";
         public string ResetHintText => $"Drag an app here to set it back to the default {KindLabel.ToLowerInvariant()} device";
 
         public ObservableCollection<MixerChannelViewModel> Channels { get; } = new ObservableCollection<MixerChannelViewModel>();

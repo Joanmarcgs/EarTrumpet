@@ -178,6 +178,12 @@ namespace EarTrumpet
             set => _settings.Set("SettingsWindowPlacement", value);
         }
 
+        public WINDOWPLACEMENT? BurxatMixerWindowPlacement
+        {
+            get => _settings.Get("BurxatMixerWindowPlacement", default(WINDOWPLACEMENT?));
+            set => _settings.Set("BurxatMixerWindowPlacement", value);
+        }
+
         public event Action<double> BurxatMixerScaleChanged;
         public event Action<string> BurxatMixerThemeChanged;
 
