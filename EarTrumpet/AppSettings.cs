@@ -201,6 +201,26 @@ namespace EarTrumpet
             }
         }
 
+        public event Action<bool> BurxatMixerStayOnTopChanged;
+
+        public bool BurxatMixerStayOnTop
+        {
+            get => _settings.Get("BurxatMixerStayOnTop", false);
+            set
+            {
+                _settings.Set("BurxatMixerStayOnTop", value);
+                BurxatMixerStayOnTopChanged?.Invoke(value);
+            }
+        }
+
+        // Backed directly by the Run registry key rather than the settings bag, since the key
+        // itself - not a stored preference - is the source of truth for whether this is enabled.
+        public bool BurxatMixerStartWithWindows
+        {
+            get => StartupHelper.IsEnabled;
+            set => StartupHelper.IsEnabled = value;
+        }
+
         private bool IsTelemetryEnabledByDefault()
         {
             // Discussion on what to include:

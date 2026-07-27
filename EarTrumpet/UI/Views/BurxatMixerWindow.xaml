@@ -28,6 +28,15 @@
         <SolidColorBrush x:Key="BurxatBorder" Color="#FF7A7A7A" />
         <FontFamily x:Key="BurxatFontFamily">Segoe UI</FontFamily>
 
+        <Style x:Key="DeviceKindToggleStyle" TargetType="Button">
+            <Setter Property="Margin" Value="0,0,6,0" />
+            <Setter Property="Padding" Value="12,5" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{DynamicResource BurxatText}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BurxatBorder}" />
+        </Style>
+
         <!--  A slim track + rectangular cap, closer to a physical mixer fader than the app's default slider.  -->
         <Style x:Key="AnalogFaderStyle" TargetType="{x:Type Slider}">
             <Setter Property="Minimum" Value="0" />
@@ -144,11 +153,11 @@
                     <TextBlock FontSize="10" TextWrapping="Wrap">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
-                                <Setter Property="Text" Value="Double-click to set as Default Output Device" />
+                                <Setter Property="Text" Value="{Binding DoubleClickHintText}" />
                                 <Setter Property="Foreground" Value="{DynamicResource BurxatSubtleText}" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding IsDefault}" Value="True">
-                                        <Setter Property="Text" Value="Default Output Device" />
+                                        <Setter Property="Text" Value="{Binding DefaultDeviceLabelText}" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -178,7 +187,7 @@
                     <TextBlock Margin="6,4"
                                HorizontalAlignment="Center"
                                VerticalAlignment="Center"
-                               Text="Drag an app here to play it on this device"
+                               Text="{Binding DropHintText}"
                                TextAlignment="Center"
                                TextWrapping="Wrap"
                                Foreground="{DynamicResource BurxatSubtleText}" />
@@ -229,9 +238,42 @@
                     Style="{StaticResource CloseButtonStyle}" />
         </Grid>
 
+        <StackPanel Margin="14,6,0,0"
+                    HorizontalAlignment="Left"
+                    DockPanel.Dock="Top"
+                    Orientation="Horizontal">
+            <Button Command="{Binding ShowOutput}" Content="Output Devices">
+                <Button.Style>
+                    <Style BasedOn="{StaticResource DeviceKindToggleStyle}" TargetType="Button">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsShowingOutput}" Value="True">
+                                <Setter Property="Background" Value="#3399FF" />
+                                <Setter Property="Foreground" Value="White" />
+                                <Setter Property="BorderBrush" Value="#3399FF" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+            <Button Command="{Binding ShowInput}" Content="Input Devices">
+                <Button.Style>
+                    <Style BasedOn="{StaticResource DeviceKindToggleStyle}" TargetType="Button">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsShowingInput}" Value="True">
+                                <Setter Property="Background" Value="#3399FF" />
+                                <Setter Property="Foreground" Value="White" />
+                                <Setter Property="BorderBrush" Value="#3399FF" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+        </StackPanel>
+
         <StackPanel Width="220"
                     Margin="10,6"
                     AllowDrop="True"
+                    DataContext="{Binding SelectedMixer}"
                     DockPanel.Dock="Top"
                     DragOver="Channel_DragOver"
                     Drop="MasterFader_Drop">
@@ -260,7 +302,7 @@
                            HorizontalAlignment="Center"
                            VerticalAlignment="Center"
                            FontSize="10"
-                           Text="Drag an app here to set it back to the default output device"
+                           Text="{Binding ResetHintText}"
                            TextAlignment="Center"
                            TextWrapping="Wrap"
                            Foreground="{DynamicResource BurxatSubtleText}" />
@@ -272,6 +314,7 @@
         <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
             <ItemsControl Margin="0,0,0,12"
                           HorizontalAlignment="Center"
+                          DataContext="{Binding SelectedMixer}"
                           ItemsSource="{Binding Channels}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>

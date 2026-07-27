@@ -33,6 +33,7 @@ namespace EarTrumpet
 
         public FlyoutWindow FlyoutWindow { get; private set; }
         public DeviceCollectionViewModel CollectionViewModel { get; private set; }
+        public DeviceCollectionViewModel RecordingCollectionViewModel { get; private set; }
 
         private static readonly Stopwatch s_appTimer = Stopwatch.StartNew();
         private FlyoutViewModel _flyoutViewModel;
@@ -137,6 +138,9 @@ namespace EarTrumpet
             deviceManager.Loaded += (_, __) => CompleteStartup();
             CollectionViewModel = new DeviceCollectionViewModel(deviceManager, Settings);
 
+            var recordingDeviceManager = WindowsAudioFactory.Create(AudioDeviceKind.Recording);
+            RecordingCollectionViewModel = new DeviceCollectionViewModel(recordingDeviceManager, Settings);
+
             _trayIcon = new ShellNotifyIcon(new TaskbarIconSource(CollectionViewModel, Settings));
             Exit += (_, __) => _trayIcon.IsVisible = false;
             CollectionViewModel.TrayPropertyChanged += () => _trayIcon.SetTooltip(CollectionViewModel.GetTrayToolTip());
@@ -156,7 +160,7 @@ namespace EarTrumpet
             DebugHelpers.Add();
 #endif
             _mixerWindow = new WindowHolder(CreateMixerExperience);
-            _burxatMixerWindow = new WindowHolder(() => new BurxatMixerWindow { DataContext = new BurxatMixerViewModel(CollectionViewModel) });
+            _burxatMixerWindow = new WindowHolder(() => new BurxatMixerWindow { DataContext = new BurxatMixerWindowViewModel(CollectionViewModel, RecordingCollectionViewModel) });
             _settingsWindow = new WindowHolder(CreateSettingsExperience);
 
             StartBurxatMixerActivationServer();

@@ -87,7 +87,7 @@ namespace EarTrumpet.UI.ViewModels
                 e.PropertyName == nameof(Default.IsMuted) ||
                 e.PropertyName == nameof(Default.DisplayName))
             {
-                TrayPropertyChanged.Invoke();
+                TrayPropertyChanged?.Invoke();
             }
         }
 

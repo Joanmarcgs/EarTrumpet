@@ -62,6 +62,22 @@
             <Setter Property="Foreground" Value="{DynamicResource BurxatText}" />
             <Setter Property="BorderBrush" Value="{DynamicResource BurxatBorder}" />
         </Style>
+
+        <DataTemplate x:Key="DisabledDeviceTemplate" DataType="{x:Type vm:DisabledDeviceViewModel}">
+            <Grid Margin="0,3,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock VerticalAlignment="Center"
+                           Text="{Binding DisplayName}"
+                           TextTrimming="CharacterEllipsis" />
+                <Button Grid.Column="1"
+                        Command="{Binding Enable}"
+                        Content="Enable"
+                        Style="{StaticResource ActionButtonStyle}" />
+            </Grid>
+        </DataTemplate>
     </Window.Resources>
     <!--
         The Window's own Background must stay whatever DialogWindowStyle sets (Transparent), since
@@ -112,46 +128,76 @@
                         </ItemsControl.ItemsPanel>
                     </ItemsControl>
 
+                    <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="Behavior" />
+                    <TextBlock Text="Start with Windows" />
+                    <ItemsControl Margin="0,4,0,0"
+                                  ItemsSource="{Binding StartWithWindowsChoices}"
+                                  ItemTemplate="{StaticResource ChoiceChipTemplate}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+
+                    <TextBlock Margin="0,8,0,0" Text="Keep Burxat's Mixer on top" />
+                    <ItemsControl Margin="0,4,0,0"
+                                  ItemsSource="{Binding StayOnTopChoices}"
+                                  ItemTemplate="{StaticResource ChoiceChipTemplate}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+
                     <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="Disabled Devices" />
                     <TextBlock FontSize="10"
-                               Text="Windows is hiding these playback devices. Enabling one makes it appear on the main window."
+                               Text="Windows is hiding these devices. Enabling one makes it appear on the main window."
                                TextWrapping="Wrap"
                                Foreground="{DynamicResource BurxatSubtleText}" />
-                    <ItemsControl Margin="0,4,0,0" ItemsSource="{Binding DisabledDevices}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate DataType="{x:Type vm:DisabledDeviceViewModel}">
-                                <Grid Margin="0,3,0,0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock VerticalAlignment="Center"
-                                               Text="{Binding DisplayName}"
-                                               TextTrimming="CharacterEllipsis" />
-                                    <Button Grid.Column="1"
-                                            Command="{Binding Enable}"
-                                            Content="Enable"
-                                            Style="{StaticResource ActionButtonStyle}" />
-                                </Grid>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+
+                    <TextBlock Margin="0,6,0,0" FontWeight="SemiBold" Text="Playback" />
+                    <ItemsControl Margin="0,4,0,0"
+                                  ItemsSource="{Binding DisabledPlaybackDevices}"
+                                  ItemTemplate="{StaticResource DisabledDeviceTemplate}" />
                     <TextBlock Margin="0,4,0,0"
                                FontSize="10"
                                Foreground="{DynamicResource BurxatSubtleText}">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
-                                <Setter Property="Text" Value="No disabled devices found." />
+                                <Setter Property="Text" Value="No disabled playback devices found." />
                                 <Setter Property="Visibility" Value="Collapsed" />
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding DisabledDevices.Count}" Value="0">
+                                    <DataTrigger Binding="{Binding DisabledPlaybackDevices.Count}" Value="0">
                                         <Setter Property="Visibility" Value="Visible" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </TextBlock.Style>
                     </TextBlock>
-                    <Button Margin="0,4,0,0"
+
+                    <TextBlock Margin="0,10,0,0" FontWeight="SemiBold" Text="Recording" />
+                    <ItemsControl Margin="0,4,0,0"
+                                  ItemsSource="{Binding DisabledRecordingDevices}"
+                                  ItemTemplate="{StaticResource DisabledDeviceTemplate}" />
+                    <TextBlock Margin="0,4,0,0"
+                               FontSize="10"
+                               Foreground="{DynamicResource BurxatSubtleText}">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Text" Value="No disabled recording devices found." />
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding DisabledRecordingDevices.Count}" Value="0">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+
+                    <Button Margin="0,8,0,0"
                             HorizontalAlignment="Left"
                             Command="{Binding RefreshDisabledDevices}"
                             Content="Refresh"

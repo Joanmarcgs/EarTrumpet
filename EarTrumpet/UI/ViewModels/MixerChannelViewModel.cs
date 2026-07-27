@@ -18,13 +18,15 @@ namespace EarTrumpet.UI.ViewModels
         public event EventHandler<int> VolumeSetByUser;
 
         public DeviceViewModel Device { get; }
+        public MixerDeviceKind Kind { get; }
+        public string KindLabel => Kind == MixerDeviceKind.Output ? "Output" : "Input";
         public string DisplayName => Device.DisplayName;
         public ICommand MakeDefault { get; }
         public ObservableCollection<ContextMenuItem> DeviceMenu { get; }
         public ObservableCollection<MixerAppViewModel> Apps { get; } = new ObservableCollection<MixerAppViewModel>();
 
         // 1-based position among the channel strips, kept in sync by BurxatMixerViewModel,
-        // purely so each column can be labeled "Output Device 1", "Output Device 2", etc.
+        // purely so each column can be labeled "Output Device 1", "Input Device 1", etc.
         public int Ordinal
         {
             get => _ordinal;
@@ -38,7 +40,11 @@ namespace EarTrumpet.UI.ViewModels
                 }
             }
         }
-        public string OrdinalLabel => $"Output Device {Ordinal}";
+        public string OrdinalLabel => $"{KindLabel} Device {Ordinal}";
+        public string DoubleClickHintText => $"Double-click to set as Default {KindLabel} Device";
+        public string DefaultDeviceLabelText => $"Default {KindLabel} Device";
+        public string DropHintText => Kind == MixerDeviceKind.Output ?
+            "Drag an app here to play it on this device" : "Drag an app here to record from this device";
 
         public bool IsDefault
         {
@@ -69,14 +75,15 @@ namespace EarTrumpet.UI.ViewModels
         private bool _isDefault;
         private int _ordinal;
 
-        public MixerChannelViewModel(DeviceCollectionViewModel mainViewModel, DeviceViewModel device)
+        public MixerChannelViewModel(DeviceCollectionViewModel mainViewModel, DeviceViewModel device, MixerDeviceKind kind)
         {
             _mainViewModel = mainViewModel;
             Device = device;
+            Kind = kind;
             MakeDefault = new RelayCommand(Device.MakeDefaultDevice);
             DeviceMenu = new ObservableCollection<ContextMenuItem>
             {
-                new ContextMenuItem { DisplayName = "Set as Default Output Device", Command = MakeDefault },
+                new ContextMenuItem { DisplayName = $"Set as Default {KindLabel} Device", Command = MakeDefault },
                 new ContextMenuItem { DisplayName = "Disable Device", Command = new RelayCommand(ConfirmAndDisableDevice) },
             };
 
@@ -131,7 +138,7 @@ namespace EarTrumpet.UI.ViewModels
             Apps.Clear();
             foreach (var app in apps.OrderBy(a => a.DisplayName, StringComparer.CurrentCultureIgnoreCase))
             {
-                Apps.Add(new MixerAppViewModel(_mainViewModel, app));
+                Apps.Add(new MixerAppViewModel(_mainViewModel, app, Kind));
             }
         }
     }

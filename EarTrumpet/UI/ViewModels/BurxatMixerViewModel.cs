@@ -8,6 +8,10 @@ namespace EarTrumpet.UI.ViewModels
 {
     public class BurxatMixerViewModel : BindableBase
     {
+        public MixerDeviceKind Kind { get; }
+        public string KindLabel => Kind == MixerDeviceKind.Output ? "Output" : "Input";
+        public string ResetHintText => $"Drag an app here to set it back to the default {KindLabel.ToLowerInvariant()} device";
+
         public ObservableCollection<MixerChannelViewModel> Channels { get; } = new ObservableCollection<MixerChannelViewModel>();
 
         public int MasterVolume
@@ -36,9 +40,10 @@ namespace EarTrumpet.UI.ViewModels
         private readonly Dictionary<string, int> _baseVolumes = new Dictionary<string, int>();
         private int _masterVolume = 100;
 
-        public BurxatMixerViewModel(DeviceCollectionViewModel mainViewModel)
+        public BurxatMixerViewModel(DeviceCollectionViewModel mainViewModel, MixerDeviceKind kind)
         {
             _mainViewModel = mainViewModel;
+            Kind = kind;
 
             foreach (var device in _mainViewModel.AllDevices)
             {
@@ -113,7 +118,7 @@ namespace EarTrumpet.UI.ViewModels
         {
             RecordBaseVolume(device.Id, device.Volume);
 
-            var channel = new MixerChannelViewModel(_mainViewModel, device)
+            var channel = new MixerChannelViewModel(_mainViewModel, device, Kind)
             {
                 IsDefault = _mainViewModel.Default != null && _mainViewModel.Default.Id == device.Id,
             };

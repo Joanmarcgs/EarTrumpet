@@ -19,10 +19,15 @@ namespace EarTrumpet.UI.ViewModels
         // implicit style for every ComboBox (its Settings page's search-as-you-type box), so a
         // bare <ComboBox/> here would silently inherit that behavior instead of acting like a
         // normal dropdown.
+        private static readonly string[] OffOnValues = { "Off", "On" };
+
         public ObservableCollection<SelectableOptionViewModel> ScaleChoices { get; } = new ObservableCollection<SelectableOptionViewModel>();
         public ObservableCollection<SelectableOptionViewModel> ThemeChoices { get; } = new ObservableCollection<SelectableOptionViewModel>();
+        public ObservableCollection<SelectableOptionViewModel> StartWithWindowsChoices { get; } = new ObservableCollection<SelectableOptionViewModel>();
+        public ObservableCollection<SelectableOptionViewModel> StayOnTopChoices { get; } = new ObservableCollection<SelectableOptionViewModel>();
 
-        public ObservableCollection<DisabledDeviceViewModel> DisabledDevices { get; } = new ObservableCollection<DisabledDeviceViewModel>();
+        public ObservableCollection<DisabledDeviceViewModel> DisabledPlaybackDevices { get; } = new ObservableCollection<DisabledDeviceViewModel>();
+        public ObservableCollection<DisabledDeviceViewModel> DisabledRecordingDevices { get; } = new ObservableCollection<DisabledDeviceViewModel>();
         public ICommand RefreshDisabledDevices { get; }
 
         public string DeveloperCredit => "Interface by Burxat (info@burxat.dev)";
@@ -40,22 +45,37 @@ namespace EarTrumpet.UI.ViewModels
             {
                 ThemeChoices.Add(new SelectableOptionViewModel(theme, () => App.Settings.BurxatMixerTheme = theme));
             }
+            foreach (var value in OffOnValues)
+            {
+                var isOn = value == "On";
+                StartWithWindowsChoices.Add(new SelectableOptionViewModel(value, () => { App.Settings.BurxatMixerStartWithWindows = isOn; UpdateSelection(); }));
+                StayOnTopChoices.Add(new SelectableOptionViewModel(value, () => App.Settings.BurxatMixerStayOnTop = isOn));
+            }
             UpdateSelection();
             App.Settings.BurxatMixerScaleChanged += OnScaleChanged;
             App.Settings.BurxatMixerThemeChanged += OnThemeChanged;
+            App.Settings.BurxatMixerStayOnTopChanged += OnStayOnTopChanged;
 
             RefreshDisabledDevices = new RelayCommand(LoadDisabledDevices);
             LoadDisabledDevices();
+        }
+
+        private void LoadDisabledDevices()
+        {
+            LoadDisabledDevices(EDataFlow.eRender, DisabledPlaybackDevices);
+            LoadDisabledDevices(EDataFlow.eCapture, DisabledRecordingDevices);
         }
 
         public void Cleanup()
         {
             App.Settings.BurxatMixerScaleChanged -= OnScaleChanged;
             App.Settings.BurxatMixerThemeChanged -= OnThemeChanged;
+            App.Settings.BurxatMixerStayOnTopChanged -= OnStayOnTopChanged;
         }
 
         private void OnScaleChanged(double _) => UpdateSelection();
         private void OnThemeChanged(string _) => UpdateSelection();
+        private void OnStayOnTopChanged(bool _) => UpdateSelection();
 
         private void UpdateSelection()
         {
@@ -68,44 +88,52 @@ namespace EarTrumpet.UI.ViewModels
             {
                 choice.IsSelected = choice.Label == App.Settings.BurxatMixerTheme;
             }
+            foreach (var choice in StartWithWindowsChoices)
+            {
+                choice.IsSelected = (choice.Label == "On") == App.Settings.BurxatMixerStartWithWindows;
+            }
+            foreach (var choice in StayOnTopChoices)
+            {
+                choice.IsSelected = (choice.Label == "On") == App.Settings.BurxatMixerStayOnTop;
+            }
         }
 
         private static string FormatScale(double scale) => $"{scale * 100:0}%";
 
-        private void LoadDisabledDevices()
+        private static void LoadDisabledDevices(EDataFlow flow, ObservableCollection<DisabledDeviceViewModel> target)
         {
-            DisabledDevices.Clear();
+            target.Clear();
             try
             {
                 var enumerator = (IMMDeviceEnumerator)new MMDeviceEnumerator();
-                var devices = enumerator.EnumAudioEndpoints(EDataFlow.eRender, DeviceState.DISABLED);
+                var devices = enumerator.EnumAudioEndpoints(flow, DeviceState.DISABLED);
                 var count = devices.GetCount();
                 for (uint i = 0; i < count; i++)
                 {
                     var device = devices.Item(i);
                     var id = device.GetId();
                     var name = device.OpenPropertyStore(STGM.STGM_READ).GetValue<string>(PropertyKeys.PKEY_Device_FriendlyName);
-                    DisabledDevices.Add(new DisabledDeviceViewModel(id, name, EnableDevice));
+                    target.Add(new DisabledDeviceViewModel(id, name, EnableDevice));
                 }
             }
             catch (Exception ex)
             {
                 Trace.WriteLine($"BurxatMixerSettingsViewModel LoadDisabledDevices Failed: {ex}");
             }
-        }
 
-        private void EnableDevice(string id)
-        {
-            try
+            void EnableDevice(string deviceId)
             {
-                new AutoPolicyConfigClientWin7().SetEndpointVisibility(id, true);
-            }
-            catch (Exception ex)
-            {
-                Trace.WriteLine($"BurxatMixerSettingsViewModel EnableDevice Failed: {ex}");
-            }
+                try
+                {
+                    new AutoPolicyConfigClientWin7().SetEndpointVisibility(deviceId, true);
+                }
+                catch (Exception ex)
+                {
+                    Trace.WriteLine($"BurxatMixerSettingsViewModel EnableDevice Failed: {ex}");
+                }
 
-            LoadDisabledDevices();
+                LoadDisabledDevices(flow, target);
+            }
         }
     }
 }

@@ -25,16 +25,19 @@ namespace EarTrumpet.UI.Views
             InitializeComponent();
             Closed += (_, __) =>
             {
-                (DataContext as BurxatMixerViewModel)?.Cleanup();
+                (DataContext as BurxatMixerWindowViewModel)?.Cleanup();
                 App.Settings.BurxatMixerScaleChanged -= ApplyScale;
                 App.Settings.BurxatMixerThemeChanged -= ApplyTheme;
+                App.Settings.BurxatMixerStayOnTopChanged -= ApplyStayOnTop;
             };
             SourceInitialized += OnSourceInitialized;
 
             App.Settings.BurxatMixerScaleChanged += ApplyScale;
             App.Settings.BurxatMixerThemeChanged += ApplyTheme;
+            App.Settings.BurxatMixerStayOnTopChanged += ApplyStayOnTop;
             ApplyScale(App.Settings.BurxatMixerScale);
             ApplyTheme(App.Settings.BurxatMixerTheme);
+            ApplyStayOnTop(App.Settings.BurxatMixerStayOnTop);
         }
 
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
@@ -59,6 +62,8 @@ namespace EarTrumpet.UI.Views
         }
 
         private void ApplyTheme(string theme) => ThemePalette.ApplyTo(Resources, theme);
+
+        private void ApplyStayOnTop(bool stayOnTop) => Topmost = stayOnTop;
 
         private void OnSourceInitialized(object sender, EventArgs e)
         {
@@ -161,9 +166,9 @@ namespace EarTrumpet.UI.Views
             if (e.Data.GetDataPresent(DraggedAppFormat) &&
                 e.Data.GetData(DraggedAppFormat) is IAppItemViewModel app &&
                 ((FrameworkElement)sender).DataContext is MixerChannelViewModel channel &&
-                DataContext is BurxatMixerViewModel viewModel)
+                DataContext is BurxatMixerWindowViewModel windowViewModel)
             {
-                viewModel.MoveAppToChannel(channel, app);
+                windowViewModel.SelectedMixer.MoveAppToChannel(channel, app);
             }
         }
 

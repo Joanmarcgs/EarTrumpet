@@ -329,6 +329,8 @@
     <Compile Include="AppSettings.cs" />
     <Compile Include="UI\ViewModels\WelcomeViewModel.cs" />
     <Compile Include="UI\ViewModels\BurxatMixerViewModel.cs" />
+    <Compile Include="UI\ViewModels\BurxatMixerWindowViewModel.cs" />
+    <Compile Include="UI\ViewModels\MixerDeviceKind.cs" />
     <Compile Include="UI\ViewModels\MixerChannelViewModel.cs" />
     <Compile Include="UI\ViewModels\MixerAppViewModel.cs" />
     <Compile Include="UI\ViewModels\BurxatMixerSettingsViewModel.cs" />
@@ -348,6 +350,7 @@
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Interop\Helpers\SingleInstanceAppMutex.cs" />
+    <Compile Include="Interop\Helpers\StartupHelper.cs" />
     <Compile Include="UI\Controls\VolumeSlider.cs" />
     <Compile Include="DataModel\WindowsAudio\Internal\AudioDeviceSessionGroup.cs" />
     <Compile Include="Interop\MMDeviceAPI\AudioSessionDisconnectReason.cs" />

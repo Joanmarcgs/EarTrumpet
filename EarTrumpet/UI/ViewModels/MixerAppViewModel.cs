@@ -18,19 +18,20 @@ namespace EarTrumpet.UI.ViewModels
         public bool IsMovable => App.IsMovable;
         public ObservableCollection<ContextMenuItem> MoveMenu { get; }
 
-        public MixerAppViewModel(DeviceCollectionViewModel mainViewModel, IAppItemViewModel app)
+        public MixerAppViewModel(DeviceCollectionViewModel mainViewModel, IAppItemViewModel app, MixerDeviceKind kind)
         {
             App = app;
 
             if (App.IsMovable)
             {
                 var persistedDeviceId = app.PersistedOutputDevice;
+                var kindLabel = kind == MixerDeviceKind.Output ? "Output" : "Input";
 
                 var items = new List<ContextMenuItem>
                 {
                     new ContextMenuItem
                     {
-                        DisplayName = Properties.Resources.DefaultDeviceText,
+                        DisplayName = $"Default {kindLabel} Device",
                         IsChecked = string.IsNullOrWhiteSpace(persistedDeviceId),
                         Command = new RelayCommand(() => mainViewModel.MoveAppToDevice(app, null)),
                     },
